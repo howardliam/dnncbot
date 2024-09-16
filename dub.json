@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"Liam"
+	],
+	"copyright": "Copyright © 2024, Liam",
+	"description": "A naughts and crosses bot written in D.",
+	"license": "MIT",
+	"name": "nnc_bot"
+}

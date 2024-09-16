@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/nnc_bot
+nnc_bot.so
+nnc_bot.dylib
+nnc_bot.dll
+nnc_bot.a
+nnc_bot.lib
+nnc_bot-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst
