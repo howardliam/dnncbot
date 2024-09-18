@@ -1,6 +1,6 @@
 module game;
 
-import move;
+import move, bot;
 import std.stdio, std.random, std.datetime, std.string, std.algorithm;
 import core.thread;
 
@@ -42,7 +42,9 @@ class Game
         this.playerSide = playerSide;
 
         this.board = [
-            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY
+            EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY,
         ];
     }
 
@@ -129,15 +131,15 @@ class Game
 class GameManager
 {
     private Game game;
+    private Bot bot;
 
     private Random rng;
-
-    private bool sideSelected = false;
 
     this()
     {
         Side playerSide;
 
+        bool sideSelected = false;
         while (!sideSelected)
         {
             write("Choose a side: naughts or crosses? (n/c) ");
@@ -160,6 +162,7 @@ class GameManager
         writeln();
 
         game = new Game(playerSide);
+        bot = new Bot(playerSide.invertSide);
 
         // Seed random number generator
         auto currentTime = Clock.currTime();
@@ -239,22 +242,10 @@ class GameManager
                 writeln("Bot is thinking...\n");
                 Thread.sleep(dur!("seconds")(1));
 
-                // Generate every possible move
-                auto botSide = game.playerSide.invertSide();
-                Move[] generatedMoves;
-                foreach (i, tile; game.board)
-                {
-                    if (tile == EMPTY)
-                    {
-                        generatedMoves ~= new Move(cast(int) i, botSide);
-                    }
-                }
+                bot.generateAllMoves(game.board);
+                auto move = bot.randomMove();
 
-                // Random move selection
-                auto moveIndex = uniform(0, generatedMoves.length, rng);
-                auto chosenMove = generatedMoves[moveIndex];
-
-                game.makeMove(chosenMove);
+                game.makeMove(move);
             }
         }
         printGame();
