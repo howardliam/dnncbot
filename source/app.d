@@ -6,7 +6,6 @@ void main()
 {
     writeln("Welcome to Naughts and Crosses");
 
-    auto playerSide = Side.CROSSES;
-    auto game = new Game(playerSide);
-    game.gameLoop();
+    auto gameManager = new GameManager();
+    gameManager.run();
 }

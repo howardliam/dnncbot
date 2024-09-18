@@ -28,6 +28,7 @@ class Game
 
     private char[9] board;
     private bool gameOver = false;
+    private Side sideWon;
 
     private Side sideToMove = Side.CROSSES;
     private Move[9] previousMoves;
@@ -40,33 +41,6 @@ class Game
         this.board = [
             EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY
         ];
-    }
-
-    private void printGame()
-    {
-        string whoseMove = sideToMove == Side.CROSSES ? "Cross's move" : "Naught's move";
-        string movesElapsed = numberMoves != 1 ? "moves elapsed" : "move elapsed";
-        writefln("%s - %d %s", whoseMove, numberMoves, movesElapsed);
-
-        int count = 0;
-        int row = 1;
-        foreach (tile; board)
-        {
-            if (count == 0)
-            {
-                writef("%d", row++);
-            }
-
-            writef(" %s ", tile);
-            count += 1;
-
-            if (count > 2)
-            {
-                write("\n");
-                count = 0;
-            }
-        }
-        writeln("  a  b  c");
     }
 
     private void makeMove(Move move)
@@ -105,6 +79,7 @@ class Game
 
     private void checkForWin(char player)
     {
+
         foreach (i; 0 .. 3)
         {
             if (board[i * 3] == player && board[i * 3 + 1] == player && board[i * 3 + 2] == player)
@@ -125,15 +100,68 @@ class Game
         {
             gameOver = true;
         }
+
+        if (gameOver)
+        {
+            if (player == NAUGHT)
+            {
+                sideWon = Side.NAUGHTS;
+            }
+        }
+    }
+}
+
+class GameManager
+{
+    private Game game;
+
+    this()
+    {
+        game = new Game(Side.CROSSES);
     }
 
-    void gameLoop()
+    private void printGame()
     {
-        while (!gameOver)
+        if (!game.gameOver)
+        {
+            string whoseMove = game.sideToMove == Side.CROSSES ? "Cross's move" : "Naught's move";
+            string movesElapsed = game.numberMoves != 1 ? "moves elapsed" : "move elapsed";
+            writefln("%s - %d %s", whoseMove, game.numberMoves, movesElapsed);
+        }
+        else if (game.gameOver)
+        {
+            string whoWon = game.sideWon == Side.NAUGHTS ? "Naughts" : "Crosses";
+            writefln("%s has won after %d moves!", whoWon, game.numberMoves);
+        }
+
+        int count = 0;
+        int row = 1;
+        foreach (tile; game.board)
+        {
+            if (count == 0)
+            {
+                writef("%d", row++);
+            }
+
+            writef(" %s ", tile);
+            count += 1;
+
+            if (count > 2)
+            {
+                write("\n");
+                count = 0;
+            }
+        }
+        writeln("  a  b  c");
+    }
+
+    public void run()
+    {
+        while (!game.gameOver)
         {
             printGame();
 
-            if (playerSide == sideToMove)
+            if (game.playerSide == game.sideToMove)
             {
                 bool receivedValidInput = false;
                 while (!receivedValidInput)
@@ -143,19 +171,20 @@ class Game
                     bool isValid = validateStringMove(result);
                     if (isValid)
                     {
-                        auto move = moveFromString(result, playerSide);
-                        makeMove(move);
+                        auto move = moveFromString(result, game.playerSide);
+                        game.makeMove(move);
                         receivedValidInput = true;
                     }
+                    writeln();
                 }
             }
             else
             {
                 // Do bot stuff here...
-                writeln("Bot is thinking... ");
-                sideToMove = sideToMove.invertSide();
+                writeln("Bot is thinking...\n");
+                game.sideToMove = game.sideToMove.invertSide();
             }
         }
-        printGame();
+        game.printGame();
     }
 }
