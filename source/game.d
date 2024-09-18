@@ -1,6 +1,8 @@
 module game;
 
-import move, std.stdio, std.random, std.datetime, std.string, core.thread;
+import move;
+import std.stdio, std.random, std.datetime, std.string, std.algorithm;
+import core.thread;
 
 const char NAUGHT = 'O';
 const char CROSS = 'X';
@@ -28,6 +30,7 @@ class Game
 
     private char[9] board;
     private bool gameOver = false;
+    private bool stalemate = false;
     private Side sideWon;
 
     private Side sideToMove = Side.CROSSES;
@@ -56,8 +59,10 @@ class Game
         numberMoves++;
 
         sideToMove = invertSide(move.sideToMove);
+
         checkForWin(CROSS);
         checkForWin(NAUGHT);
+        checkForStalemate();
     }
 
     private void undoPreviousMove(Move move)
@@ -109,6 +114,23 @@ class Game
             }
         }
     }
+
+    private void checkForStalemate()
+    {
+        foreach (tile; board)
+        {
+            if (tile == EMPTY)
+            {
+                return;
+            }
+            else
+            {
+                continue;
+            }
+        }
+        stalemate = true;
+        gameOver = true;
+    }
 }
 
 class GameManager
@@ -140,6 +162,9 @@ class GameManager
             }
         }
         writeln();
+        string side = playerSide == Side.CROSSES ? "crosses" : "naughts";
+        writefln("You have selected %s!", side);
+        writeln();
 
         game = new Game(playerSide);
 
@@ -157,6 +182,10 @@ class GameManager
             string whoseMove = game.sideToMove == Side.CROSSES ? "Cross's move" : "Naught's move";
             string movesElapsed = game.numberMoves != 1 ? "moves elapsed" : "move elapsed";
             writefln("%s - %d %s", whoseMove, game.numberMoves, movesElapsed);
+        }
+        else if (game.stalemate)
+        {
+            writefln("After %d moves, the game finished on a stalemate!", game.numberMoves);
         }
         else if (game.gameOver)
         {
@@ -196,7 +225,7 @@ class GameManager
                 bool receivedValidInput = false;
                 while (!receivedValidInput)
                 {
-                    write("Enter move ([abc][123]): ");
+                    write("Enter tile to play ([abc][123]): ");
                     auto result = readln();
                     bool isValid = validateStringMove(result);
                     if (isValid)
