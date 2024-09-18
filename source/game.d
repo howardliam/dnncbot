@@ -121,7 +121,11 @@ class GameManager
     {
         game = new Game(Side.CROSSES);
 
-        rng = Random(34_534);
+        auto currentTime = Clock.currTime();
+        long unixTime = currentTime.toUnixTime();
+
+        auto seeder = Random(cast(int) unixTime);
+        rng = Random(uniform(0, int.max, seeder));
     }
 
     private void printGame()
