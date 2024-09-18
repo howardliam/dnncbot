@@ -65,21 +65,14 @@ class Game
         checkForStalemate();
     }
 
-    private void undoPreviousMove(Move move)
+    private void undoPreviousMove()
     {
-        // Move previousMove = previousMoves[numberMoves - 1];
-        // bool sameTile = previousMove.tile == move.tile;
-        // bool sameSide = previousMove.sideToMove == move.sideToMove;
+        Move previousMove = previousMoves[numberMoves - 1];
 
-        // if (!sameTile && !sameSide)
-        // {
-        //     return;
-        // }
-
-        // sideToMove = move.sideToMove;
-        // previousMoves[numberMoves - 1] = null;
-        // numberMoves--;
-        // board[move.tile] = EMPTY;
+        sideToMove = previousMove.sideToMove;
+        previousMoves[numberMoves - 1] = null;
+        numberMoves--;
+        board[previousMove.tile] = EMPTY;
     }
 
     private void checkForWin(char player)
