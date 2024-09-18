@@ -1,6 +1,6 @@
 module move;
 
-import std.string, std.stdio;
+import std.string, std.stdio, std.regex;
 
 import game;
 
@@ -25,13 +25,9 @@ bool validateStringMove(string move)
     {
         return false;
     }
-    char file = move[0];
-    if (file != 'a' && file != 'b' && file != 'c')
-    {
-        return false;
-    }
-    char rank = move[1];
-    if (rank != '1' && rank != '2' && rank != '3')
+
+    auto moveRegex = regex(r"[abc][123]");
+    if (!matchFirst(move, moveRegex))
     {
         return false;
     }
@@ -45,8 +41,6 @@ Move moveFromString(string move, Side sideToMove)
 
     int file = move[0] - 'a';
     int rank = move[1] - '1';
-
-    // writefln("file %d, rank %d", file, rank);
 
     return new Move((rank * 3) + file, sideToMove);
 }
