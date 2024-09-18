@@ -60,21 +60,21 @@ class Game
         checkForWin(NAUGHT);
     }
 
-    private void unmakeMove(Move move)
+    private void undoPreviousMove(Move move)
     {
-        Move previousMove = previousMoves[numberMoves - 1];
-        bool sameTile = previousMove.tile == move.tile;
-        bool sameSide = previousMove.sideToMove == move.sideToMove;
+        // Move previousMove = previousMoves[numberMoves - 1];
+        // bool sameTile = previousMove.tile == move.tile;
+        // bool sameSide = previousMove.sideToMove == move.sideToMove;
 
-        if (!sameTile && !sameSide)
-        {
-            return;
-        }
+        // if (!sameTile && !sameSide)
+        // {
+        //     return;
+        // }
 
-        sideToMove = move.sideToMove;
-        previousMoves[numberMoves - 1] = null;
-        numberMoves--;
-        board[move.tile] = EMPTY;
+        // sideToMove = move.sideToMove;
+        // previousMoves[numberMoves - 1] = null;
+        // numberMoves--;
+        // board[move.tile] = EMPTY;
     }
 
     private void checkForWin(char player)
@@ -121,9 +121,9 @@ class GameManager
     {
         game = new Game(Side.CROSSES);
 
+        // Seed random number generator
         auto currentTime = Clock.currTime();
         long unixTime = currentTime.toUnixTime();
-
         auto seeder = Random(cast(int) unixTime);
         rng = Random(uniform(0, int.max, seeder));
     }
@@ -160,7 +160,7 @@ class GameManager
                 count = 0;
             }
         }
-        writeln("  a  b  c");
+        writeln("  a  b  c\n");
     }
 
     public void run()
@@ -174,27 +174,29 @@ class GameManager
                 bool receivedValidInput = false;
                 while (!receivedValidInput)
                 {
-                    write("Enter move ([a-c1-3]): ");
+                    write("Enter move ([abc][123]): ");
                     auto result = readln();
                     bool isValid = validateStringMove(result);
                     if (isValid)
                     {
                         auto move = moveFromString(result, game.playerSide);
-                        game.makeMove(move);
-                        receivedValidInput = true;
+                        bool tileOccupied = game.board[move.tile] != EMPTY;
+                        if (!tileOccupied)
+                        {
+                            game.makeMove(move);
+                            receivedValidInput = true;
+                        }
                     }
                     writeln();
                 }
             }
             else
             {
-                // Do bot stuff here...
                 writeln("Bot is thinking...\n");
 
+                // Generate every possible move
                 auto botSide = game.playerSide.invertSide();
-
                 Move[] generatedMoves;
-
                 foreach (i, tile; game.board)
                 {
                     if (tile == EMPTY)
@@ -203,6 +205,7 @@ class GameManager
                     }
                 }
 
+                // Random move selection
                 auto moveIndex = uniform(0, generatedMoves.length, rng);
                 auto chosenMove = generatedMoves[moveIndex];
 
