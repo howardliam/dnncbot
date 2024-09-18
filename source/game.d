@@ -185,6 +185,6 @@ class GameManager
                 game.sideToMove = game.sideToMove.invertSide();
             }
         }
-        game.printGame();
+        printGame();
     }
 }
