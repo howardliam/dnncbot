@@ -1,6 +1,6 @@
 module game;
 
-import move, std.stdio, std.random, std.datetime;
+import move, std.stdio, std.random, std.datetime, std.string, core.thread;
 
 const char NAUGHT = 'O';
 const char CROSS = 'X';
@@ -117,9 +117,31 @@ class GameManager
 
     private Random rng;
 
+    private bool sideSelected = false;
+
     this()
     {
-        game = new Game(Side.CROSSES);
+        Side playerSide;
+
+        while (!sideSelected)
+        {
+            write("Choose a side: naughts or crosses? (n/c) ");
+            auto result = readln();
+            result = result.strip();
+            if (result == "n")
+            {
+                playerSide = Side.NAUGHTS;
+                sideSelected = true;
+            }
+            else if (result == "c")
+            {
+                playerSide = Side.CROSSES;
+                sideSelected = true;
+            }
+        }
+        writeln();
+
+        game = new Game(playerSide);
 
         // Seed random number generator
         auto currentTime = Clock.currTime();
@@ -187,12 +209,13 @@ class GameManager
                             receivedValidInput = true;
                         }
                     }
-                    writeln();
                 }
+                writeln();
             }
             else
             {
                 writeln("Bot is thinking...\n");
+                Thread.sleep(dur!("seconds")(1));
 
                 // Generate every possible move
                 auto botSide = game.playerSide.invertSide();
