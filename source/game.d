@@ -1,6 +1,6 @@
 module game;
 
-import move, std.stdio;
+import move, std.stdio, std.random, std.datetime;
 
 const char NAUGHT = 'O';
 const char CROSS = 'X';
@@ -115,9 +115,13 @@ class GameManager
 {
     private Game game;
 
+    private Random rng;
+
     this()
     {
         game = new Game(Side.CROSSES);
+
+        rng = Random(34_534);
     }
 
     private void printGame()
@@ -182,7 +186,23 @@ class GameManager
             {
                 // Do bot stuff here...
                 writeln("Bot is thinking...\n");
-                game.sideToMove = game.sideToMove.invertSide();
+
+                auto botSide = game.playerSide.invertSide();
+
+                Move[] generatedMoves;
+
+                foreach (i, tile; game.board)
+                {
+                    if (tile == EMPTY)
+                    {
+                        generatedMoves ~= new Move(cast(int) i, botSide);
+                    }
+                }
+
+                auto moveIndex = uniform(0, generatedMoves.length, rng);
+                auto chosenMove = generatedMoves[moveIndex];
+
+                game.makeMove(chosenMove);
             }
         }
         printGame();
